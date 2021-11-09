@@ -1,13 +1,12 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:meta/meta.dart';
 import 'models/models.dart';
 
 class AuthenticationRepository {
   AuthenticationRepository({
-    firebase_auth.FirebaseAuth firebaseAuth,
-    GoogleSignIn googleSignIn,
+    firebase_auth.FirebaseAuth? firebaseAuth,
+    GoogleSignIn? googleSignIn,
   })  : _firebaseAuth = firebaseAuth ?? firebase_auth.FirebaseAuth.instance,
         _googleSignIn = googleSignIn ?? GoogleSignIn.standard();
 
@@ -16,15 +15,16 @@ class AuthenticationRepository {
 
   Stream<User> get user {
     return _firebaseAuth.authStateChanges().map((firebaseUser) {
-      return firebaseUser == null ? User.empty : firebaseUser.toUser;
+      return firebaseUser == null
+          ? const User(email: '', id: '', name: '', photo: '')
+          : firebaseUser.toUser;
     });
   }
 
   Future<void> signUp({
-    @required String email,
-    @required String password,
+    required String email,
+    required String password,
   }) async {
-    assert(email != null && password != null);
     try {
       await _firebaseAuth.createUserWithEmailAndPassword(
         email: email,
@@ -45,20 +45,19 @@ class AuthenticationRepository {
 
   Future<void> googleAuthentification() async {
     final googleUser = await _googleSignIn.signIn();
-    final googleAuth = await googleUser.authentication;
+    final googleAuth = await googleUser!.authentication;
     final credential = firebase_auth.GoogleAuthProvider.credential(
       idToken: googleAuth.idToken,
       accessToken: googleAuth.accessToken,
     );
     final result = await _firebaseAuth.signInWithCredential(credential);
-    print('${result.user.displayName}');
+    print('${result.user!.displayName}');
   }
 
   Future<void> logInWithEmailAndPassword({
-    @required String email,
-    @required String password,
+    required String email,
+    required String password,
   }) async {
-    assert(email != null && password != null);
     try {
       await _firebaseAuth.signInWithEmailAndPassword(
         email: email,

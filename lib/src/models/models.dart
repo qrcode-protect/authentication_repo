@@ -10,16 +10,14 @@ class User extends Equatable {
   })  : assert(email != null),
         assert(id != null);
 
-  final String email;
+  final String? email;
 
-  final String id;
+  final String? id;
 
-  final String name;
+  final String? name;
 
-  final String photo;
-
-  static const empty = User(email: '', id: '', name: null, photo: null);
+  final String? photo;
 
   @override
-  List<Object> get props => [email, id, name, photo];
+  List<Object> get props => [email!, id!, name!, photo!];
 }
